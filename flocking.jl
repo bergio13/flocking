@@ -6,22 +6,23 @@ mutable struct Sheep
 end
 
 # Parameters for the flocking simulation
-@kwdef struct FlockParams
+@kwdef mutable struct FlockParams
     separation_weight::Float64 = 0.15
     cohesion_weight::Float64 = 0.4
     alignment_weight::Float64 = 0.3
-    max_speed::Float64 = 0.5
-    radius::Float64 = 1.5
+    max_speed::Float64 = 0.4
+    radius::Float64 = 1
     world_size::Float64 = 20.0
-    noise_intensity::Float64 = 0.5
+    noise_intensity::Float64 = 0.2
+    delta_t::Float64 = 1.0
 end
 
 
 # Update the position of a sheep based on its velocity
-function update_position!(sheep::Sheep, delta_t::Float64=1.0)
-    sheep.position += sheep.velocity * delta_t
+function update_position!(agent, delta_t::Float64=1.0, noise_intensity::Float64=0.2)
+    agent.position += agent.velocity * delta_t
     # Add bounded randomness
-    sheep.velocity += SVector(randn(), randn()) * 0.1
+    agent.velocity += SVector(randn(), randn()) * noise_intensity
 end
 
 # Separation rule: steer to avoid crowding local flockmates
@@ -109,21 +110,6 @@ end
 #    sheep.position = mod.(sheep.position, size)
 #end
 
-# Soft boundary conditions
-function apply_soft_boundary!(sheep::Sheep, world_size::Float64, boundary_force::Float64=0.5)
-    # Repulsive force near boundaries
-    if sheep.position[1] < 0.1
-        sheep.velocity += SVector(boundary_force, 0.0)
-    elseif sheep.position[1] > world_size - 0.1
-        sheep.velocity += SVector(-boundary_force, 0.0)
-    end
-    if sheep.position[2] < 0.1
-        sheep.velocity += SVector(0.0, boundary_force)
-    elseif sheep.position[2] > world_size - 0.1
-        sheep.velocity += SVector(0.0, -boundary_force)
-    end
-end
-
 function apply_boundary!(agent, world_size)
     for i in 1:2
         if agent.position[i] < 0 || agent.position[i] > world_size
@@ -144,7 +130,7 @@ end
 function update_flock!(flock::Vector{Sheep}, p::FlockParams)
     for sheep in flock
         update_velocity!(sheep, flock, p)
-        update_position!(sheep)
+        update_position!(sheep, p.delta_t, p.noise_intensity)
         apply_boundary!(sheep, p.world_size)
     end
 end
@@ -160,13 +146,16 @@ function plot_flock(flock::Vector{Sheep}, step::Int, p::FlockParams)
     u = [sheep.velocity[1] for sheep in flock]
     v = [sheep.velocity[2] for sheep in flock]
 
+    # Adjust arrow lengths based on world size
+    u = u .* p.world_size / 10
+    v = v .* p.world_size / 10
+
     # Plot sheep positions
     plt = scatter(x, y, xlim=(0, p.world_size), ylim=(0, p.world_size),
         title="Flock Step $step", legend=false, aspect_ratio=:equal)
 
     speeds = [norm(sheep.velocity) for sheep in flock]
-    colors = [speed / maximum(speeds) for speed in speeds]  # Normalize speeds for coloring
-    quiver!(x, y, quiver=(u, v), color=colors, colormap=:coolwarm, linewidth=0.5)
+    quiver!(x, y, quiver=(u, v), color=speeds, colormap=:coolwarm, linewidth=0.5)
     # Plot boundaries
     plot!([0, p.world_size, p.world_size, 0, 0], [0, 0, p.world_size, p.world_size, 0],
         color=:black, linewidth=2, linestyle=:dash, legend=false)
@@ -181,12 +170,20 @@ function simulate_and_plot!(flock::Vector{Sheep}, steps::Int, p::FlockParams)
         update_flock!(flock, p)
         plot_flock(flock, step, p)
     end
-    gif(anim, fps=15)
+    gif(anim,
+        #"images/flock.gif", 
+        fps=15)
 end
 
 
 
+
 # Usage
-params = FlockParams()
-flock = create_flock(15, params.world_size)
-simulate_and_plot!(flock, 100, params)
+function run()
+    params = FlockParams(world_size=20.0)
+    flock = create_flock(100, params.world_size)
+    simulate_and_plot!(flock, 100, params)
+end
+
+# Comment the follwing line when running herd.jl
+#run()
