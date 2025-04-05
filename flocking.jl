@@ -12,7 +12,7 @@ end
     cohesion_weight::Float64 = 0.4
     alignment_weight::Float64 = 0.3
     max_speed::Float64 = 0.4
-    radius::Float64 = 1.0
+    radius::Float64 = 2.0
     world_size::Float64 = 20.0
     noise_intensity::Float64 = 0.2
     delta_t::Float64 = 1.0
@@ -185,8 +185,8 @@ end
 # Comment the follwing line when running herd.jl
 #run()
 
-function benchmark_simulation(steps::Int=100, n_agents::Int=1000)
-    params = FlockParams(world_size=100.0)
+function benchmark_simulation(steps::Int=100, n_agents::Int=10000)
+    params = FlockParams(world_size=1000.0)
     flock = create_flock(n_agents, params.world_size)
 
     @btime begin
