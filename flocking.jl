@@ -1,4 +1,5 @@
 using StaticArrays, Random, LinearAlgebra, Plots
+using BenchmarkTools
 
 mutable struct Sheep
     position::SVector{2,Float64}
@@ -11,7 +12,7 @@ end
     cohesion_weight::Float64 = 0.4
     alignment_weight::Float64 = 0.3
     max_speed::Float64 = 0.4
-    radius::Float64 = 1
+    radius::Float64 = 1.0
     world_size::Float64 = 20.0
     noise_intensity::Float64 = 0.2
     delta_t::Float64 = 1.0
@@ -135,7 +136,6 @@ function update_flock!(flock::Vector{Sheep}, p::FlockParams)
     end
 end
 
-
 # Plotting function for the flock
 function plot_flock(flock::Vector{Sheep}, step::Int, p::FlockParams)
     # Extract positions
@@ -163,7 +163,6 @@ function plot_flock(flock::Vector{Sheep}, step::Int, p::FlockParams)
     display(plt)
 end
 
-
 # Simulation function with plotting
 function simulate_and_plot!(flock::Vector{Sheep}, steps::Int, p::FlockParams)
     anim = @animate for step in 1:steps
@@ -176,8 +175,6 @@ function simulate_and_plot!(flock::Vector{Sheep}, steps::Int, p::FlockParams)
 end
 
 
-
-
 # Usage
 function run()
     params = FlockParams(world_size=20.0)
@@ -187,3 +184,17 @@ end
 
 # Comment the follwing line when running herd.jl
 #run()
+
+function benchmark_simulation(steps::Int=100, n_agents::Int=1000)
+    params = FlockParams(world_size=100.0)
+    flock = create_flock(n_agents, params.world_size)
+
+    @btime begin
+        local f = deepcopy($flock)
+        for _ in 1:$steps
+            update_flock!(f, $params)
+        end
+    end
+end
+
+benchmark_simulation()
