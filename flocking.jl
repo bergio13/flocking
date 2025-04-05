@@ -185,7 +185,7 @@ end
 # Comment the follwing line when running herd.jl
 #run()
 
-function benchmark_simulation(steps::Int=100, n_agents::Int=10000)
+function benchmark_simulation(steps::Int=100, n_agents::Int=1000)
     params = FlockParams(world_size=1000.0)
     flock = create_flock(n_agents, params.world_size)
 

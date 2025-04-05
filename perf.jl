@@ -46,7 +46,7 @@ end
 model = flocking_model(
     Random.MersenneTwister(42),
     (1000, 1000),
-    10000,
+    1000,
     2.0,
     speed=1.5,
     cohere_factor=0.1,
