@@ -176,25 +176,38 @@ end
 
 
 # Usage
-function run()
-    params = FlockParams(world_size=20.0)
-    flock = create_flock(100, params.world_size)
-    simulate_and_plot!(flock, 100, params)
-end
+
+#function run()
+#    params = FlockParams(world_size=20.0)
+#    flock = create_flock(100, params.world_size)
+#    simulate_and_plot!(flock, 100, params)
+#end
 
 # Comment the follwing line when running herd.jl
 #run()
 
-function benchmark_simulation(steps::Int=100, n_agents::Int=1000)
-    params = FlockParams(world_size=1000.0)
-    flock = create_flock(n_agents, params.world_size)
 
-    @btime begin
-        local f = deepcopy($flock)
-        for _ in 1:$steps
-            update_flock!(f, $params)
-        end
+function initialize_model(n_agents::Int=10000)
+    params = FlockParams(world_size=100.0)
+    flock = create_flock(n_agents, params.world_size)
+    return (flock, params)
+end
+
+function run!(flock, params, steps::Int=100)
+    for _ in 1:steps
+        update_flock!(flock, params)
     end
 end
 
-benchmark_simulation()
+function benchmarkable_simulation(n_agents::Int=10000, steps::Int=100)
+    flock, params = initialize_model(n_agents)
+    return @benchmarkable begin
+        f = deepcopy($flock) # copy for clean runs
+        run!(f, $params, $steps)
+    end
+end
+
+# Measure performance of the model
+bench = benchmarkable_simulation()
+tune!(bench)
+results = BenchmarkTools.run(bench)

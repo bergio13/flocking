@@ -16,12 +16,12 @@ end
 const EXTENT = (98, 98)
 
 function initialize_model(;
-    n_sheeps=1000,
+    n_sheeps=100,
     speed=1.5,
     cohesion_weight=0.1,
-    separation=2.0,
+    separation=5.0,
     separation_weight=0.25,
-    alignment_wieght=0.04,
+    alignment_wieght=0.1,
     visual_distance=5.0,
     extent=(100, 100),
     seed=42,
@@ -98,24 +98,32 @@ function agent_step!(sheep, model)
     #reflect!(sheep, EXTENT)
 end
 
-model = initialize_model()
-@btime run!($model, 100)
+function render_flocking_video()
+    sheep_polygon = Makie.Polygon(Point2f[(-1, -1), (2, 0), (-1, 1)])
 
-#const sheep_polygon = Makie.Polygon(Point2f[(-1, -1), (2, 0), (-1, 1)])
-#
-#function sheep_maker(s::Sheep)
-#    φ = atan(s.vel[2], s.vel[1]) #+ π/2 + π
-#    rotate_polygon(sheep_polygon, φ)
-#end
-#
-#model = initialize_model()
-#abmvideo(
-#    "images/flocking.mp4", model;
-#    agent_marker=sheep_maker,
-#    agent_size=0.5,
-#    framerate=15, frames=100,
-#    title="Flocking"
-#)
+    function sheep_maker(s::Sheep)
+        φ = atan(s.vel[2], s.vel[1])
+        rotate_polygon(sheep_polygon, φ)
+    end
 
+    model = initialize_model(n_sheeps=100)
+
+    abmvideo(
+        "images/flocking.mp4", model;
+        agent_marker=sheep_maker,
+        agent_size=0.5,
+        framerate=15,
+        frames=100,
+        title="Flocking"
+    )
+end
+
+#render_flocking_video()
+
+# Measure performance of the model
+model = initialize_model(n_sheeps=10000)
+bench = @benchmarkable run!($model, 100)
+tune!(bench)
+results = run(bench)
 
 
