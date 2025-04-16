@@ -25,7 +25,7 @@ The benchmarking results are as follows:
 
   - 1.000 agents
 
-  ```
+  julia```
   BenchmarkTools.Trial: 7 samples with 1 evaluation per sample.
    Range (min … max):  729.264 ms … 881.870 ms  ┊ GC (min … max): 0.00% … 0.00%
    Time  (median):     751.048 ms               ┊ GC (median):    0.00%
@@ -40,7 +40,7 @@ The benchmarking results are as follows:
 
   - 10.000 agents
 
-  ```
+  julia```
   BenchmarkTools.Trial: 1 sample with 1 evaluation per sample.
   Single result which took 87.227 s (0.00% GC) to evaluate,
   with a memory estimate of 2.38 MiB, over 68999 allocations.
@@ -50,7 +50,7 @@ The benchmarking results are as follows:
 
   - 1.000 agents
 
-  ```
+  julia```
   BenchmarkTools.Trial: 2 samples with 1 evaluation per sample.
    Range (min … max):  4.783 s …   4.861 s  ┊ GC (min … max): 8.77% … 7.62%
    Time  (median):     4.822 s              ┊ GC (median):    8.19%
@@ -65,7 +65,7 @@ The benchmarking results are as follows:
 
   - 10.000 agents
 
-  ```
+  julia```
   BenchmarkTools.Trial: 1 sample with 1 evaluation per sample.
   Single result which took 372.205 s (6.15% GC) to evaluate,
   with a memory estimate of 163.84 GiB, over 5487300709 allocations.
@@ -75,7 +75,7 @@ The benchmarking results are as follows:
 
   - 1.000 agents
 
-  ```
+  julia```
   BenchmarkTools.Trial: 3 samples with 1 evaluation per sample.
    Range (min … max):  1.736 s …    2.062 s  ┊ GC (min … max): 14.87% … 12.91%
    Time  (median):     1.775 s               ┊ GC (median):    15.00%
@@ -90,7 +90,7 @@ The benchmarking results are as follows:
 
   - 10.000 agents
 
-  ```
+  julia```
   BenchmarkTools.Trial: 1 sample with 1 evaluation per sample.
   Single result which took 37.377 s (12.49% GC) to evaluate,
   with a memory estimate of 37.84 GiB, over 1269617067 allocations.
